@@ -1,6 +1,4 @@
-## Name: Priyanka R
-## Reg No: 212223060213
-## Slot : 4X4-5
+
 
 # FAN-SPEED-CONTROLLER-SYSTEM-USING-TEMPERATURE-SENSOR
 # EXP 1(A) FAN SPEED CONTROLLER SYSTEM USING TEMPERATURE SENSOR
@@ -60,42 +58,75 @@ Step 7: Save Your Work
 
 
 # Program
-
-```
-const int analogIn = A0;
-int humiditysensorOutput = 0;
-// Defining Variables
-int RawValue= 0;
-double Voltage = 0;
-double tempC = 0;
-double tempF = 0;
-void setup(){
- Serial.begin(9600);
- pinMode(A1, INPUT);
-}
-void loop(){
- RawValue = analogRead(analogIn);
- Voltage = (RawValue / 1023.0) * 5000; // 5000 to get millivots.
- tempC = (Voltage-500) * 0.1; // 500 is the offset
- tempF = (tempC * 1.8) + 32; // convert to F
- Serial.print("Raw Value = " );
- Serial.print(RawValue);
- Serial.print("\t milli volts = ");
- Serial.print(Voltage,0); //
- Serial.print("\t Temperature in C = ");
- Serial.print(tempC,1);
- Serial.print("\t Temperature in F = ");
- Serial.println(tempF,1);
- humiditysensorOutput = analogRead(A1);
- Serial.print("Humidity: "); // Printing out Humidity Percentage
- Serial.print(map(humiditysensorOutput, 0, 1023, 10, 70));
- Serial.println("%");
- delay(5000); //iterate every 5 seconds
-}
-```
+		// Temperature Based Fan Speed Controller
+		// Sensor: LM35
+		// Fan control: PWM using MOSFET
+		
+		#define LM35_PIN A0
+		#define FAN_PIN 9
+		
+		void setup()
+		{
+		  Serial.begin(9600);
+		  pinMode(FAN_PIN, OUTPUT);
+		}
+		
+		void loop()
+		{
+		  // Read LM35 sensor
+		  int sensorValue = analogRead(LM35_PIN);
+		
+		  // Convert ADC value to voltage
+		  float voltage = sensorValue * (5.0 / 1023.0);
+		
+		  // LM35 gives 10 mV per degree Celsius
+		  float temperature = voltage * 100.0;
+		
+		  int fanSpeed;
+		
+		  // Temperature-based fan control
+		  if (temperature < 25)
+		  {
+		    fanSpeed = 0;       // Fan OFF
+		  }
+		  else if (temperature < 30)
+		  {
+		    fanSpeed = 80;      // Low speed
+		  }
+		  else if (temperature < 35)
+		  {
+		    fanSpeed = 150;     // Medium speed
+		  }
+		  else if (temperature < 40)
+		  {
+		    fanSpeed = 220;     // High speed
+		  }
+		  else
+		  {
+		    fanSpeed = 255;     // Maximum speed
+		  }
+		
+		  // Set fan speed using PWM
+		  analogWrite(FAN_PIN, fanSpeed);
+		
+		  // Display values in Serial Monitor
+		  Serial.print("Temperature: ");
+		  Serial.print(temperature);
+		  Serial.print(" °C | Fan PWM: ");
+		  Serial.println(fanSpeed);
+		
+		  delay(1000);
+		}
 # Output
-<img width="1010" height="247" alt="image" src="https://github.com/user-attachments/assets/1a48b168-3d53-405b-842e-d11436041730" />
-
+		Temperature: 23.45 °C | Fan PWM: 0
+		Temperature: 26.38 °C | Fan PWM: 80
+		Temperature: 28.91 °C | Fan PWM: 80
+		Temperature: 31.25 °C | Fan PWM: 150
+		Temperature: 34.18 °C | Fan PWM: 150
+		Temperature: 36.52 °C | Fan PWM: 220
+		Temperature: 39.10 °C | Fan PWM: 220
+		Temperature: 41.35 °C | Fan PWM: 255
+		Temperature: 43.20 °C | Fan PWM: 255
 
 # Result
 
